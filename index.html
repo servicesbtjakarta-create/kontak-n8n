@@ -293,3 +293,51 @@
             // 2. Validasi Required Cabang
             if (!cabangValue) {
                 alert('⚠️ Silakan pilih Lokasi Cabang terlebih dahulu!');
+                document.getElementById('cabang').focus();
+                return;
+            }
+
+            // 3. Validasi Required Kunci Koordinat GPS Lokasi
+            if (!lokasiInput.value) {
+                alert('⚠️ Anda wajib klik tombol "Ambil Lokasi Saat Ini" sebelum mengirim data absen!');
+                return;
+            }
+            
+            // Format waktu standar Indonesia
+            const waktuSekarang = new Date().toLocaleString("id-ID", {
+                timeZone: "Asia/Jakarta",
+                dateStyle: "medium",
+                timeStyle: "medium"
+            });
+
+            const data = {
+                nama: namaValue,
+                cabang: cabangValue, 
+                lokasi: lokasiInput.value,
+                waktu: waktuSekarang
+            };
+
+            const webhookUrl = 'https://n8n-m1wtmfpb5ajg.n8x.biz.id/webhook/c89bbaf9-4406-4449-916b-93b6081e4e39'; 
+
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    alert('🎉 Data berhasil dikirim');
+                    document.getElementById('contactForm').reset();
+                    locationStatus.textContent = "Lokasi belum diambil";
+                    locationBtn.textContent = "📍 Ambil Lokasi Saat Ini";
+                } else {
+                    alert('Server n8n merespons dengan error kodes: ' + response.status);
+                }
+            } catch (error) {
+                alert('Gagal mengirim data (Masalah Koneksi/CORS): ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
