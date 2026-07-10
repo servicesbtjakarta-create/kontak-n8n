@@ -86,8 +86,8 @@
             box-shadow: 0 0 0 4px rgba(255, 108, 55, 0.15);
         }
 
-        /* Kotak Status Geolocation */
-        .location-box {
+        /* Kotak Status Geolocation & Kamera */
+        .location-box, .camera-box {
             background: #f0fdf4;
             border: 1px dashed #4CAF50;
             padding: 14px;
@@ -98,14 +98,39 @@
             gap: 8px;
         }
 
-        #locationStatus {
+        .camera-box {
+            background: #f0f9ff;
+            border-color: #0284c7;
+        }
+
+        #locationStatus, #cameraStatus {
             font-size: 12px;
             color: #166534;
             font-weight: 500;
         }
 
+        #cameraStatus {
+            color: #0369a1;
+        }
+
+        /* Preview Foto */
+        #photoPreview {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin: 0 auto;
+            display: none;
+            border: 3px solid #0284c7;
+        }
+
+        /* Sembunyikan Input File Asli */
+        #selfieInput {
+            display: none;
+        }
+
         /* Desain Tombol */
-        button {
+        button, .btn-custom-label {
             font-size: 15px;
             font-weight: 600;
             padding: 14px;
@@ -114,6 +139,8 @@
             cursor: pointer;
             transition: all 0.2s ease;
             width: 100%;
+            text-align: center;
+            display: block;
         }
 
         .btn-location {
@@ -121,8 +148,12 @@
             color: white;
         }
 
-        .btn-location:active {
-            background-color: #3e8e41;
+        .btn-camera {
+            background-color: #0284c7;
+            color: white;
+        }
+
+        button:active, .btn-custom-label:active {
             transform: scale(0.98);
         }
 
@@ -136,7 +167,6 @@
 
         .btn-submit:active {
             background-color: #e05a2b;
-            transform: scale(0.98);
         }
     </style>
 </head>
@@ -177,9 +207,19 @@
                 <button type="button" id="getLocationBtn" class="btn-location">📍 Ambil Lokasi Saat Ini</button>
                 <span id="locationStatus">Lokasi belum diambil</span>
             </div>
+
+            <!-- Tombol Foto Selfie (Hanya Kamera Depan Aktif) -->
+            <div class="camera-box">
+                <img id="photoPreview" src="" alt="Preview Selfie">
+                <label for="selfieInput" class="btn-custom-label btn-camera">📸 Ambil Foto Selfie</label>
+                <!-- accept image dan capture user memaksa kamera depan aktif di smartphone -->
+                <input type="file" id="selfieInput" accept="image/*" capture="user" required>
+                <span id="cameraStatus">Foto selfie belum diambil</span>
+            </div>
             
-            <!-- Input Hidden Koordinat Google Maps -->
+            <!-- Input Hidden Koordinat & Base64 Foto -->
             <input type="hidden" id="lokasi" value="">
+            <input type="hidden" id="fotoBase64" value="">
 
             <!-- Tombol Kirim -->
             <button type="submit" class="btn-submit">Kirim Data</button>
@@ -190,21 +230,23 @@
         const locationBtn = document.getElementById('getLocationBtn');
         const locationStatus = document.getElementById('locationStatus');
         const lokasiInput = document.getElementById('lokasi');
+        
+        const selfieInput = document.getElementById('selfieInput');
+        const cameraStatus = document.getElementById('cameraStatus');
+        const fotoBase64Input = document.getElementById('fotoBase64');
+        const photoPreview = document.getElementById('photoPreview');
 
-        // Fungsi untuk mengambil Geolocation Browser
+        // Fungsi Geolocation
         locationBtn.addEventListener('click', () => {
             if (!navigator.geolocation) {
                 locationStatus.textContent = "Geolocation tidak didukung oleh browser kamu.";
                 return;
             }
-
             locationStatus.textContent = "⏳ Mengambil lokasi...";
-
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const latitude = position.coords.latitude;
                     const longitude = position.coords.longitude;
-                    
                     const mapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
                     
                     lokasiInput.value = mapsLink;
@@ -218,68 +260,36 @@
             );
         });
 
-        // Event Submit Form dengan Validasi Berlapis (Strict Required)
+        // Proses Konversi Gambar Kamera ke Base64 Teks & Preview
+        selfieInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                cameraStatus.textContent = "⏳ Memproses foto...";
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    fotoBase64Input.value = e.target.result; // Teks Base64 tersimpan
+                    photoPreview.src = e.target.result;
+                    photoPreview.style.display = "block"; // Tampilkan foto bulat kecil
+                    cameraStatus.textContent = "✅ Foto selfie berhasil dikunci!";
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Event Submit Form dengan Validasi Berlapis Anti-Bypass
         document.getElementById('contactForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const namaValue = document.getElementById('nama').value.trim();
             const cabangValue = document.getElementById('cabang').value;
 
-            // 1. Validasi Required Nama (Blokir Spasi Kosong)
+            // 1. Validasi Required Nama
             if (!namaValue) {
-                alert('⚠️ Kolom Nama Lengkap wajib diisi dengan benar!');
+                alert('⚠️ Kolom Nama Lengkap wajib diisi!');
                 document.getElementById('nama').focus();
                 return;
             }
 
-            // 2. Validasi Required Pilihan Dropdown Cabang
+            // 2. Validasi Required Cabang
             if (!cabangValue) {
                 alert('⚠️ Silakan pilih Lokasi Cabang terlebih dahulu!');
-                document.getElementById('cabang').focus();
-                return;
-            }
-
-            // 3. Validasi Required Kunci Koordinat GPS Lokasi
-            if (!lokasiInput.value) {
-                alert('⚠️ Anda wajib klik tombol "Ambil Lokasi Saat Ini" sebelum mengirim data absen!');
-                return;
-            }
-            
-            // Format waktu standar Indonesia
-            const waktuSekarang = new Date().toLocaleString("id-ID", {
-                timeZone: "Asia/Jakarta",
-                dateStyle: "medium",
-                timeStyle: "medium"
-            });
-
-            const data = {
-                nama: namaValue,
-                cabang: cabangValue, 
-                lokasi: lokasiInput.value,
-                waktu: waktuSekarang
-            };
-
-            const webhookUrl = 'https://n8n-m1wtmfpb5ajg.n8x.biz.id/webhook/c89bbaf9-4406-4449-916b-93b6081e4e39'; 
-
-            try {
-                const response = await fetch(webhookUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                
-                if (response.ok) {
-                    alert('🎉 Data berhasil dikirim');
-                    document.getElementById('contactForm').reset();
-                    locationStatus.textContent = "Lokasi belum diambil";
-                    locationBtn.textContent = "📍 Ambil Lokasi Saat Ini";
-                } else {
-                    alert('Server n8n merespons dengan error kodes: ' + response.status);
-                }
-            } catch (error) {
-                alert('Gagal mengirim data (Masalah Koneksi/CORS): ' + error.message);
-            }
-        });
-    </script>
-</body>
-</html>
