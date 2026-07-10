@@ -15,13 +15,14 @@
 <body>
     <h2>Data Absen SERA BIT Jakarta</h2>
     <form id="contactForm">
+        <!-- Input Nama Lengkap -->
         <input type="text" id="nama" placeholder="Nama Lengkap" required>
         
+        <!-- Pilihan Dropdown Cabang -->
         <select id="cabang" required>
             <option value="" disabled selected>-- Pilih Cabang --</option>
             <option value="BIT PG">BIT PG</option>
             <option value="BIT BSD">BIT BSD</option>
-            <option value="BIT PIK">BIT PIK</option>
             <option value="BIT PIK">BIT PIK</option>
             <option value="BIT DS">BIT DS</option>
             <option value="BIT STR">BIT STR</option>
@@ -33,11 +34,14 @@
             <option value="BIT GWB">BIT GWB</option>
         </select>
         
+        <!-- Tombol Geolocation -->
         <button type="button" id="getLocationBtn" class="btn-location">Ambil Lokasi Saat Ini</button>
         <span id="locationStatus">Lokasi belum diambil</span>
         
+        <!-- Input Hidden untuk Menyimpan Link Google Maps -->
         <input type="hidden" id="lokasi" value="">
 
+        <!-- Tombol Kirim -->
         <button type="submit" class="btn-submit">Kirim Data</button>
     </form>
 
@@ -45,6 +49,8 @@
         const locationBtn = document.getElementById('getLocationBtn');
         const locationStatus = document.getElementById('locationStatus');
         const lokasiInput = document.getElementById('lokasi');
+        const namaInput = document.getElementById('nama');
+        const cabangInput = document.getElementById('cabang');
 
         // Fungsi untuk mengambil Geolocation Browser
         locationBtn.addEventListener('click', () => {
@@ -61,7 +67,7 @@
                     const longitude = position.coords.longitude;
                     
                     // Membuat format link Google Maps
-                    const mapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+                    const mapsLink = `https://google.com{latitude},${longitude}`;
                     
                     // Simpan link ke input hidden
                     lokasiInput.value = mapsLink;
@@ -79,6 +85,26 @@
         document.getElementById('contactForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            // 1. VALIDASI NAMA (Cek apakah kosong atau hanya berisi spasi)
+            if (!namaInput.value.trim()) {
+                alert('⚠️ Nama Lengkap wajib diisi!');
+                namaInput.focus();
+                return;
+            }
+
+            // 2. VALIDASI CABANG (Cek apakah pengguna belum memilih cabang)
+            if (!cabangInput.value) {
+                alert('⚠️ Anda wajib memilih Cabang Terlebih dahulu!');
+                cabangInput.focus();
+                return;
+            }
+            
+            // 3. VALIDASI LOKASI (Cek apakah tombol lokasi sudah diklik)
+            if (!lokasiInput.value) {
+                alert('⚠️ Anda wajib klik tombol "Ambil Lokasi Saat Ini" sebelum mengirim data absen!');
+                return;
+            }
+            
             // Membuat format tanggal otomatis kirim
             const waktuSekarang = new Date().toLocaleString("id-ID", {
                 timeZone: "Asia/Jakarta",
@@ -86,15 +112,15 @@
                 timeStyle: "medium"
             });
 
-            // PERBAIKAN: Mengambil nilai 'cabang' dan menyertakan 'waktu'
+            // Mengambil data form setelah lolos semua validasi
             const data = {
-                nama: document.getElementById('nama').value,
-                cabang: document.getElementById('cabang').value, 
+                nama: namaInput.value.trim(),
+                cabang: cabangInput.value, 
                 lokasi: lokasiInput.value,
                 waktu: waktuSekarang
             };
 
-            const webhookUrl = 'https://n8n-m1wtmfpb5ajg.n8x.biz.id/webhook/c89bbaf9-4406-4449-916b-93b6081e4e39'; 
+            const webhookUrl = 'https://n8x.biz.id'; 
 
             try {
                 const response = await fetch(webhookUrl, {
@@ -104,7 +130,7 @@
                 });
                 
                 if (response.ok) {
-                    alert('Data berhasil dikirim ke n8n!');
+                    alert('🎉 Data absen Anda berhasil dikirim!');
                     document.getElementById('contactForm').reset();
                     locationStatus.textContent = "Lokasi belum diambil";
                     locationBtn.textContent = "Ambil Lokasi Saat Ini";
