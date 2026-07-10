@@ -13,15 +13,16 @@
     </style>
 </head>
 <body>
-    <h2>Data Abses SERA BIT Jakarta</h2>
+    <h2>Data Absen SERA BIT Jakarta</h2>
     <form id="contactForm">
         <input type="text" id="nama" placeholder="Nama Lengkap" required>
+        
         <select id="cabang" required>
-    <option value="" disabled selected>-- Pilih Cabang --</option>
-    <option value="Jakarta">BIT Pulogadung</option>
-    <option value="Bandung">BIT BSD</option>
-    <option value="Surabaya">BIT PIK</option>
-</select>
+            <option value="" disabled selected>-- Pilih Cabang --</option>
+            <option value="BIT Pulogadung">BIT Pulogadung</option>
+            <option value="BIT BSD">BIT BSD</option>
+            <option value="BIT PIK">BIT PIK</option>
+        </select>
         
         <button type="button" id="getLocationBtn" class="btn-location">Ambil Lokasi Saat Ini</button>
         <span id="locationStatus">Lokasi belum diambil</span>
@@ -69,13 +70,21 @@
         document.getElementById('contactForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            // Membuat format tanggal otomatis kirim
+            const waktuSekarang = new Date().toLocaleString("id-ID", {
+                timeZone: "Asia/Jakarta",
+                dateStyle: "medium",
+                timeStyle: "medium"
+            });
+
+            // PERBAIKAN: Mengambil nilai 'cabang' dan menyertakan 'waktu'
             const data = {
                 nama: document.getElementById('nama').value,
-                email: document.getElementById('email').value,
-                lokasi: lokasiInput.value // Mengirimkan link lokasi (akan kosong jika user tidak klik tombol lokasi)
+                cabang: document.getElementById('cabang').value, 
+                lokasi: lokasiInput.value,
+                waktu: waktuSekarang
             };
 
-            // GANTI DENGAN URL WEBHOOK N8N KAMU
             const webhookUrl = 'https://n8n-m1wtmfpb5ajg.n8x.biz.id/webhook/c89bbaf9-4406-4449-916b-93b6081e4e39'; 
 
             try {
@@ -90,9 +99,11 @@
                     document.getElementById('contactForm').reset();
                     locationStatus.textContent = "Lokasi belum diambil";
                     locationBtn.textContent = "Ambil Lokasi Saat Ini";
+                } else {
+                    alert('Server n8n merespons dengan error kodes: ' + response.status);
                 }
             } catch (error) {
-                alert('Gagal mengirim data: ' + error.message);
+                alert('Gagal mengirim data (Masalah Koneksi/CORS): ' + error.message);
             }
         });
     </script>
