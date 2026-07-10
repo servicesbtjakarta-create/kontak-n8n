@@ -78,6 +78,7 @@
             outline: none;
             transition: all 0.2s ease;
             -webkit-appearance: none; /* Normalkan tampilan di iPhone/Safari */
+            appearance: none;
         }
 
         input[type="text"]:focus, select:focus {
@@ -182,12 +183,12 @@
                 <label for="nama">Nama Lengkap</label>
                 <input type="text" id="nama" placeholder="Nama Lengkap" required>
             </div>
-            
-            <!-- Dropdown Cabang -->
+
+            <!-- Dropdown Cabang Asal -->
             <div class="form-group">
-                <label for="cabang">Lokasi Cabang</label>
-                <select id="cabang" required>
-                    <option value="" disabled selected>-- Pilih Cabang --</option>
+                <label for="cabangAsal">Cabang Asal</label>
+                <select id="cabangAsal" required>
+                    <option value="" disabled selected>-- Pilih Cabang Asal --</option>
                     <option value="BIT PG">BIT PG</option>
                     <option value="BIT BSD">BIT BSD</option>
                     <option value="BIT PIK">BIT PIK</option>
@@ -202,17 +203,26 @@
                 </select>
             </div>
             
+            <!-- Dropdown Lokasi Cabang SERA -->
+            <div class="form-group">
+                <label for="lokasiSera">Lokasi Cabang SERA (Tujuan)</label>
+                <select id="lokasiSera" required>
+                    <option value="" disabled selected>-- Pilih Lokasi --</option>
+                    <option value="SERA DS">SERA DS</option>
+                    <option value="SERA PURI">SERA PURI</option>
+                </select>
+            </div>
+            
             <!-- Tombol & Status Lokasi -->
             <div class="location-box">
                 <button type="button" id="getLocationBtn" class="btn-location">📍 Ambil Lokasi Saat Ini</button>
                 <span id="locationStatus">Lokasi belum diambil</span>
             </div>
 
-            <!-- Tombol Foto Selfie (Hanya Kamera Depan Aktif) -->
+            <!-- Tombol Foto Selfie -->
             <div class="camera-box">
                 <img id="photoPreview" src="" alt="Preview Selfie">
                 <label for="selfieInput" class="btn-custom-label btn-camera">📸 Ambil Foto Selfie</label>
-                <!-- accept image dan capture user memaksa kamera depan aktif di smartphone -->
                 <input type="file" id="selfieInput" accept="image/*" capture="user" required>
                 <span id="cameraStatus">Foto selfie belum diambil</span>
             </div>
@@ -267,21 +277,22 @@
                 cameraStatus.textContent = "⏳ Memproses foto...";
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    fotoBase64Input.value = e.target.result; // Teks Base64 tersimpan
+                    fotoBase64Input.value = e.target.result;
                     photoPreview.src = e.target.result;
-                    photoPreview.style.display = "block"; // Tampilkan foto bulat kecil
+                    photoPreview.style.display = "block";
                     cameraStatus.textContent = "✅ Foto selfie berhasil dikunci!";
                 }
                 reader.readAsDataURL(file);
             }
         });
 
-        // Event Submit Form dengan Validasi Berlapis Anti-Bypass
+        // Event Submit Form
         document.getElementById('contactForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const namaValue = document.getElementById('nama').value.trim();
-            const cabangValue = document.getElementById('cabang').value;
+            const cabangAsalValue = document.getElementById('cabangAsal').value;
+            const lokasiSeraValue = document.getElementById('lokasiSera').value;
 
             // 1. Validasi Required Nama
             if (!namaValue) {
@@ -290,16 +301,29 @@
                 return;
             }
 
-            // 2. Validasi Required Cabang
-            if (!cabangValue) {
-                alert('⚠️ Silakan pilih Lokasi Cabang terlebih dahulu!');
-                document.getElementById('cabang').focus();
+            // 2. Validasi Required Cabang Asal
+            if (!cabangAsalValue) {
+                alert('⚠️ Silakan pilih Cabang Asal terlebih dahulu!');
+                document.getElementById('cabangAsal').focus();
                 return;
             }
 
-            // 3. Validasi Required Kunci Koordinat GPS Lokasi
+            // 3. Validasi Required Lokasi SERA
+            if (!lokasiSeraValue) {
+                alert('⚠️ Silakan pilih Lokasi Cabang SERA terlebih dahulu!');
+                document.getElementById('lokasiSera').focus();
+                return;
+            }
+
+            // 4. Validasi Required Kunci Koordinat GPS Lokasi
             if (!lokasiInput.value) {
                 alert('⚠️ Anda wajib klik tombol "Ambil Lokasi Saat Ini" sebelum mengirim data absen!');
+                return;
+            }
+
+            // 5. Validasi Required Foto Selfie
+            if (!fotoBase64Input.value) {
+                alert('⚠️ Anda wajib mengambil "Foto Selfie" sebelum mengirim data absen!');
                 return;
             }
             
@@ -310,14 +334,17 @@
                 timeStyle: "medium"
             });
 
+            // Menyusun payload objek data untuk dikirim ke webhook
             const data = {
                 nama: namaValue,
-                cabang: cabangValue, 
-                lokasi: lokasiInput.value,
-                waktu: waktuSekarang
+                cabang_asal: cabangAsalValue, 
+                lokasi_sera: lokasiSeraValue, 
+                lokasi_gps: lokasiInput.value,
+                waktu: waktuSekarang,
+                foto: fotoBase64Input.value
             };
 
-            const webhookUrl = 'https://n8n-m1wtmfpb5ajg.n8x.biz.id/webhook/c89bbaf9-4406-4449-916b-93b6081e4e39'; 
+            const webhookUrl = 'https://n8n-m1wtmfpb5ajg.n8x.biz.id/webhook-test/c89bbaf9-4406-4449-916b-93b6081e4e39'; 
 
             try {
                 const response = await fetch(webhookUrl, {
@@ -327,12 +354,14 @@
                 });
                 
                 if (response.ok) {
-                    alert('🎉 Data berhasil dikirim');
+                    alert('🎉 Data absen berhasil dikirim!');
                     document.getElementById('contactForm').reset();
+                    photoPreview.style.display = "none";
                     locationStatus.textContent = "Lokasi belum diambil";
+                    cameraStatus.textContent = "Foto selfie belum diambil";
                     locationBtn.textContent = "📍 Ambil Lokasi Saat Ini";
                 } else {
-                    alert('Server n8n merespons dengan error kodes: ' + response.status);
+                    alert('Server n8n merespons dengan error kode: ' + response.status);
                 }
             } catch (error) {
                 alert('Gagal mengirim data (Masalah Koneksi/CORS): ' + error.message);
