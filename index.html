@@ -13,17 +13,22 @@
     </style>
 </head>
 <body>
-    <h2>Tambah Kontak Baru</h2>
+    <h2>Data Abses SERA BIT Jakarta</h2>
     <form id="contactForm">
         <input type="text" id="nama" placeholder="Nama Lengkap" required>
-        <input type="email" id="email" placeholder="Alamat Email" required>
+        <select id="cabang" required>
+    <option value="" disabled selected>-- Pilih Cabang --</option>
+    <option value="Jakarta">BIT Pulogadung</option>
+    <option value="Bandung">BIT BSD</option>
+    <option value="Surabaya">BIT PIK</option>
+</select>
         
         <button type="button" id="getLocationBtn" class="btn-location">Ambil Lokasi Saat Ini</button>
         <span id="locationStatus">Lokasi belum diambil</span>
         
         <input type="hidden" id="lokasi" value="">
 
-        <button type="submit" class="btn-submit">Kirim ke n8n</button>
+        <button type="submit" class="btn-submit">Kirim Data</button>
     </form>
 
     <script>
