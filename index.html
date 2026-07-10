@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Aplikasi Kontak n8n</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 50px; }
+        form { display: flex; flex-direction: column; max-width: 300px; gap: 10px; }
+        button { cursor: pointer; padding: 10px; border: none; }
+        .btn-submit { background: #FF6C37; color: white; }
+        .btn-location { background: #4CAF50; color: white; }
+        #locationStatus { font-size: 12px; color: #555; font-style: italic; }
+    </style>
+</head>
+<body>
+    <h2>Tambah Kontak Baru</h2>
+    <form id="contactForm">
+        <input type="text" id="nama" placeholder="Nama Lengkap" required>
+        <input type="email" id="email" placeholder="Alamat Email" required>
+        
+        <button type="button" id="getLocationBtn" class="btn-location">Ambil Lokasi Saat Ini</button>
+        <span id="locationStatus">Lokasi belum diambil</span>
+        
+        <input type="hidden" id="lokasi" value="">
+
+        <button type="submit" class="btn-submit">Kirim ke n8n</button>
+    </form>
+
+    <script>
+        const locationBtn = document.getElementById('getLocationBtn');
+        const locationStatus = document.getElementById('locationStatus');
+        const lokasiInput = document.getElementById('lokasi');
+
+        // Fungsi untuk mengambil Geolocation Browser
+        locationBtn.addEventListener('click', () => {
+            if (!navigator.geolocation) {
+                locationStatus.textContent = "Geolocation tidak didukung oleh browser kamu.";
+                return;
+            }
+
+            locationStatus.textContent = "Mengambil lokasi...";
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+                    
+                    // Membuat format link Google Maps
+                    const mapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+                    
+                    // Simpan link ke input hidden
+                    lokasiInput.value = mapsLink;
+                    locationStatus.textContent = "📍 Lokasi berhasil didapatkan!";
+                    locationBtn.textContent = "Perbarui Lokasi";
+                },
+                (error) => {
+                    locationStatus.textContent = "Gagal mengambil lokasi: " + error.message;
+                },
+                { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+            );
+        });
+
+        // Event Submit Form
+        document.getElementById('contactForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const data = {
+                nama: document.getElementById('nama').value,
+                email: document.getElementById('email').value,
+                lokasi: lokasiInput.value // Mengirimkan link lokasi (akan kosong jika user tidak klik tombol lokasi)
+            };
+
+            // GANTI DENGAN URL WEBHOOK N8N KAMU
+            const webhookUrl = 'https://n8n-m1wtmfpb5ajg.n8x.biz.id/webhook/c89bbaf9-4406-4449-916b-93b6081e4e39'; 
+
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    alert('Data berhasil dikirim ke n8n!');
+                    document.getElementById('contactForm').reset();
+                    locationStatus.textContent = "Lokasi belum diambil";
+                    locationBtn.textContent = "Ambil Lokasi Saat Ini";
+                }
+            } catch (error) {
+                alert('Gagal mengirim data: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
