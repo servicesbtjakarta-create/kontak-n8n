@@ -5,250 +5,135 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Presensi Digital SERA BIT</title>
     <style>
-        /* Pengaturan Dasar & Reset */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #f3f4f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        
+        .card { background: #ffffff; width: 100%; max-width: 420px; padding: 30px 24px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); }
 
-        body {
-            background-color: #f3f4f6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+        /* Welcome Screen Styles */
+        #welcomeScreen { text-align: center; }
+        
+        /* CSS untuk Logo Halo Suzuki */
+        .welcome-logo-img {
+            max-width: 300px; /* Sesuaikan ukuran logo */
+            height: auto;
+            margin-bottom: 15px; /* Jarak antara logo dan teks */
         }
+        
+        /* Menghapus ikon emoji lama */
+        .welcome-emoji { font-size: 50px; margin-bottom: 20px; display: none; } 
+        
+        #welcomeScreen h2 { margin-bottom: 10px; }
+        .btn-start { background-color: #FF6C37; color: white; padding: 15px; border-radius: 10px; cursor: pointer; border: none; width: 100%; font-weight: 600; margin-top: 20px; }
+        
+        /* Hidden Class */
+        .hidden { display: none; }
 
-        /* Container Kartu Utama (Pas untuk Layar HP) */
-        .card {
-            background: #ffffff;
-            width: 100%;
-            max-width: 420px; 
-            padding: 30px 24px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-        }
-
-        h2 {
-            color: #1f2937;
-            font-size: 22px;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 8px;
-        }
-
-        .subtitle {
-            color: #6b7280;
-            font-size: 14px;
-            text-align: center;
-            margin-bottom: 28px;
-        }
-
-        /* Struktur Form */
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        label {
-            font-size: 13px;
-            font-weight: 600;
-            color: #4b5563;
-        }
-
-        /* Input dan Dropdown Custom */
-        input[type="text"], select {
-            width: 100%;
-            padding: 14px 16px;
-            font-size: 15px;
-            border: 1.5px solid #d1d5db;
-            border-radius: 10px;
-            background-color: #f9fafb;
-            color: #1f2937;
-            outline: none;
-            transition: all 0.2s ease;
-            -webkit-appearance: none; /* Normalkan tampilan di iPhone/Safari */
-            appearance: none;
-        }
-
-        input[type="text"]:focus, select:focus {
-            border-color: #FF6C37;
-            background-color: #ffffff;
-            box-shadow: 0 0 0 4px rgba(255, 108, 55, 0.15);
-        }
-
-        /* Kotak Status Geolocation & Kamera */
-        .location-box, .camera-box {
-            background: #f0fdf4;
-            border: 1px dashed #4CAF50;
-            padding: 14px;
-            border-radius: 10px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .camera-box {
-            background: #f0f9ff;
-            border-color: #0284c7;
-        }
-
-        #locationStatus, #cameraStatus {
-            font-size: 12px;
-            color: #166534;
-            font-weight: 500;
-        }
-
-        #cameraStatus {
-            color: #0369a1;
-        }
-
-        /* Preview Foto */
-        #photoPreview {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 50%;
-            margin: 0 auto;
-            display: none;
-            border: 3px solid #0284c7;
-        }
-
-        /* Sembunyikan Input File Asli */
-        #selfieInput {
-            display: none;
-        }
-
-        /* Desain Tombol */
-        button, .btn-custom-label, .btn-view {
-            font-size: 15px;
-            font-weight: 600;
-            padding: 14px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            width: 100%;
-            text-align: center;
-            display: block;
-            text-decoration: none;
-        }
-
-        .btn-location {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        .btn-camera {
-            background-color: #0284c7;
-            color: white;
-        }
-
-        button:active, .btn-custom-label:active, .btn-view:active {
-            transform: scale(0.98);
-        }
-
-        .btn-submit {
-            background-color: #FF6C37;
-            color: white;
-            margin-top: 10px;
-            font-size: 16px;
-            box-shadow: 0 4px 12px rgba(255, 108, 55, 0.2);
-        }
-
-        .btn-submit:active {
-            background-color: #e05a2b;
-        }
-
-        /* Style Baru untuk Tombol Lihat Data */
-        .btn-view {
-            background-color: #374151;
-            color: white;
-            margin-top: 2px;
-            box-shadow: 0 4px 12px rgba(55, 65, 81, 0.15);
-        }
-
-        .btn-view:active {
-            background-color: #1f2937;
-        }
+        /* Form & Button Styles */
+        h2 { color: #1f2937; font-size: 22px; font-weight: 700; text-align: center; margin-bottom: 8px; }
+        .subtitle { color: #6b7280; font-size: 14px; text-align: center; margin-bottom: 28px; }
+        form { display: flex; flex-direction: column; gap: 18px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        label { font-size: 13px; font-weight: 600; color: #4b5563; }
+        input[type="text"], select { width: 100%; padding: 14px 16px; font-size: 15px; border: 1.5px solid #d1d5db; border-radius: 10px; background-color: #f9fafb; outline: none; }
+        .location-box, .camera-box { background: #f0fdf4; border: 1px dashed #4CAF50; padding: 14px; border-radius: 10px; text-align: center; display: flex; flex-direction: column; gap: 8px; }
+        .camera-box { background: #f0f9ff; border-color: #0284c7; }
+        #photoPreview { width: 100px; height: 100px; object-fit: cover; border-radius: 50%; margin: 0 auto; display: none; border: 3px solid #0284c7; }
+        #selfieInput { display: none; }
+        button, .btn-custom-label, .btn-view { font-size: 15px; font-weight: 600; padding: 14px; border: none; border-radius: 10px; cursor: pointer; width: 100%; text-align: center; display: block; text-decoration: none; }
+        .btn-location { background-color: #4CAF50; color: white; }
+        .btn-camera { background-color: #0284c7; color: white; }
+        .btn-submit { background-color: #FF6C37; color: white; margin-top: 10px; }
+        .btn-view { background-color: #374151; color: white; margin-top: 5px; }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <h2>Sistem Absensi SERA BIT Jakarta</h2>
-        
-        <form id="contactForm">
-            <div class="form-group">
-                <label for="nama">Nama Lengkap</label>
-                <input type="text" id="nama" placeholder="Nama Lengkap" required>
-            </div>
-
-            <div class="form-group">
-                <label for="cabangAsal">Cabang Asal</label>
-                <select id="cabangAsal" required>
-                    <option value="" disabled selected>-- Pilih Cabang Asal --</option>
-                    <option value="BIT PG">BIT PG</option>
-                    <option value="BIT BSD">BIT BSD</option>
-                    <option value="BIT PIK">BIT PIK</option>
-                    <option value="BIT DS">BIT DS</option>
-                    <option value="BIT STR">BIT STR</option>
-                    <option value="BIT HI">BIT HI</option>
-                    <option value="BIT LCK">BIT LCK</option>
-                    <option value="BIT GDS">BIT GDS</option>
-                    <option value="BIT PURI">BIT PURI</option>
-                    <option value="BIT SWG">BIT SWG</option>
-                    <option value="BIT GWB">BIT GWB</option>
-                </select>
-            </div>
+        <!-- Halaman Cover -->
+        <div id="welcomeScreen">
+            <!-- Tambahkan tag img di sini -->
+            <img src="image_4cd6dd.png" alt="Logo Halo Suzuki" class="welcome-logo-img">
             
-            <div class="form-group">
-                <label for="lokasiSera">Lokasi Cabang SERA</label>
-                <select id="lokasiSera" required>
-                    <option value="" disabled selected>-- Pilih Lokasi --</option>
-                    <option value="SERA DS">SERA DS</option>
-                    <option value="SERA PURI">SERA PURI</option>
-                </select>
-            </div>
+            <!-- Emoji lama disembunyikan -->
+            <div class="welcome-emoji hidden">🚀</div> 
             
-            <div class="location-box">
-                <button type="button" id="getLocationBtn" class="btn-location">📍 Ambil Lokasi Saat Ini</button>
-                <span id="locationStatus">Lokasi belum diambil</span>
-            </div>
+            <h2>Selamat Datang</h2>
+            <p class="subtitle">Sistem Absensi Digital<br>After Sales BIT Jakarta</p>
+            <button id="btnStart" class="btn-start">Mulai Absensi</button>
+        </div>
 
-            <div class="camera-box">
-                <img id="photoPreview" src="" alt="Preview Selfie">
-                <label for="selfieInput" class="btn-custom-label btn-camera">📸 Ambil Foto Selfie</label>
-                <input type="file" id="selfieInput" accept="image/*" capture="user" required>
-                <span id="cameraStatus">Foto selfie belum diambil</span>
-            </div>
-            
-            <input type="hidden" id="lokasi" value="">
-            <input type="hidden" id="fotoBase64" value="">
+        <!-- Form Utama (Disembunyikan Awalnya) -->
+        <div id="mainForm" class="hidden">
+            <h2>Form Presensi</h2>
+            <form id="contactForm">
+                <div class="form-group">
+                    <label for="nama">Nama Lengkap</label>
+                    <input type="text" id="nama" placeholder="Nama Lengkap" required>
+                </div>
+                <!-- ... (Input lainnya) ... -->
+                <div class="form-group">
+                    <label for="cabangAsal">Cabang Asal</label>
+                    <select id="cabangAsal" required>
+                        <option value="" disabled selected>-- Pilih Cabang Asal --</option>
+                        <option value="BIT PG">BIT PG</option>
+                        <option value="BIT BSD">BIT BSD</option>
+                        <option value="BIT PIK">BIT PIK</option>
+                        <option value="BIT DS">BIT DS</option>
+                        <option value="BIT STR">BIT STR</option>
+                        <option value="BIT HI">BIT HI</option>
+                        <option value="BIT LCK">BIT LCK</option>
+                        <option value="BIT GDS">BIT GDS</option>
+                        <option value="BIT PURI">BIT PURI</option>
+                        <option value="BIT SWG">BIT SWG</option>
+                        <option value="BIT GWB">BIT GWB</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="lokasiSera">Lokasi Cabang SERA</label>
+                    <select id="lokasiSera" required>
+                        <option value="" disabled selected>-- Pilih Lokasi --</option>
+                        <option value="SERA DS">SERA DS</option>
+                        <option value="SERA PURI">SERA PURI</option>
+                    </select>
+                </div>
+                
+                <div class="location-box">
+                    <button type="button" id="getLocationBtn" class="btn-location">📍 Ambil Lokasi Saat Ini</button>
+                    <span id="locationStatus" style="font-size: 12px; color: #166534;">Lokasi belum diambil</span>
+                </div>
 
-            <button type="submit" class="btn-submit">Kirim Data</button>
+                <div class="camera-box">
+                    <img id="photoPreview" src="" alt="Preview Selfie">
+                    <label for="selfieInput" class="btn-custom-label btn-camera">📸 Ambil Foto Selfie</label>
+                    <input type="file" id="selfieInput" accept="image/*" capture="user" required>
+                    <span id="cameraStatus" style="font-size: 12px; color: #0369a1;">Foto belum diambil</span>
+                </div>
+                
+                <input type="hidden" id="lokasi" value="">
+                <input type="hidden" id="fotoBase64" value="">
 
-            <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vSGYOLLcStd0ddI4iaimv5O7zQ1ku1qbM3fVn_RoWuzdKhSzsFpdeqBF5KYapSrEd4cDSsxvDwGCf1P/pubhtml?gid=0&single=true" target="_blank" class="btn-view">📊 Lihat Data Absen</a>
-        </form>
-        
-        <div class="footer-copyright" style="text-align: center; margin-top: 24px; font-size: 11px; color: #9ca3af; line-height: 1.6;">
+                <button type="submit" class="btn-submit">Kirim Data</button>
+                <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vSGYOLLcStd0ddI4iaimv5O7zQ1ku1qbM3fVn_RoWuzdKhSzsFpdeqBF5KYapSrEd4cDSsxvDwGCf1P/pubhtml?gid=0&single=true" target="_blank" class="btn-view">📊 Lihat Data Absen</a>
+            </form>
+            <div class="footer-copyright" style="text-align: center; margin-top: 24px; font-size: 11px; color: #9ca3af; line-height: 1.6;">
             <div class="created-by" style="font-weight: 600; color: #6b7280;">Created By After Sales BIT</div>
             <div>© 2026 All Rights Reserved</div>
         </div>
     </div>
 
     <script>
+        // Logika Pindah Halaman
+        const btnStart = document.getElementById('btnStart');
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const mainForm = document.getElementById('mainForm');
+
+        btnStart.addEventListener('click', () => {
+            welcomeScreen.classList.add('hidden');
+            mainForm.classList.remove('hidden');
+        });
+
         const locationBtn = document.getElementById('getLocationBtn');
         const locationStatus = document.getElementById('locationStatus');
         const lokasiInput = document.getElementById('lokasi');
