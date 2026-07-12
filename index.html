@@ -357,4 +357,29 @@
                 foto: fotoBase64Input.value
             };
 
-            const webhookUrl = 'https://n8n-m
+            const webhookUrl = 'https://n8n-m1wtmfpb5ajg.n8x.biz.id/webhook-test/c89bbaf9-4406-4449-916b-93b6081e4e39'; 
+
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    alert('🎉 Data absen berhasil dikirim!');
+                    document.getElementById('contactForm').reset();
+                    photoPreview.style.display = "none";
+                    locationStatus.textContent = "Lokasi belum diambil";
+                    cameraStatus.textContent = "Foto selfie belum diambil";
+                    locationBtn.textContent = "📍 Ambil Lokasi Saat Ini";
+                } else {
+                    alert('Server n8n merespons dengan error kode: ' + response.status);
+                }
+            } catch (error) {
+                alert('Gagal mengirim data (Masalah Koneksi/CORS): ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
