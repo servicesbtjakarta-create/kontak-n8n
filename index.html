@@ -131,7 +131,7 @@
         }
 
         /* Desain Tombol */
-        button, .btn-custom-label {
+        button, .btn-custom-label, .btn-view {
             font-size: 15px;
             font-weight: 600;
             padding: 14px;
@@ -142,6 +142,7 @@
             width: 100%;
             text-align: center;
             display: block;
+            text-decoration: none;
         }
 
         .btn-location {
@@ -154,7 +155,7 @@
             color: white;
         }
 
-        button:active, .btn-custom-label:active {
+        button:active, .btn-custom-label:active, .btn-view:active {
             transform: scale(0.98);
         }
 
@@ -169,6 +170,18 @@
         .btn-submit:active {
             background-color: #e05a2b;
         }
+
+        /* Style Baru untuk Tombol Lihat Data */
+        .btn-view {
+            background-color: #374151;
+            color: white;
+            margin-top: 2px;
+            box-shadow: 0 4px 12px rgba(55, 65, 81, 0.15);
+        }
+
+        .btn-view:active {
+            background-color: #1f2937;
+        }
     </style>
 </head>
 <body>
@@ -178,13 +191,11 @@
         <div class="subtitle">Sistem Absensi Digital Karyawan</div>
         
         <form id="contactForm">
-            <!-- Input Nama -->
             <div class="form-group">
                 <label for="nama">Nama Lengkap</label>
                 <input type="text" id="nama" placeholder="Nama Lengkap" required>
             </div>
 
-            <!-- Dropdown Cabang Asal -->
             <div class="form-group">
                 <label for="cabangAsal">Cabang Asal</label>
                 <select id="cabangAsal" required>
@@ -203,7 +214,6 @@
                 </select>
             </div>
             
-            <!-- Dropdown Lokasi Cabang SERA -->
             <div class="form-group">
                 <label for="lokasiSera">Lokasi Cabang SERA</label>
                 <select id="lokasiSera" required>
@@ -213,13 +223,11 @@
                 </select>
             </div>
             
-            <!-- Tombol & Status Lokasi -->
             <div class="location-box">
                 <button type="button" id="getLocationBtn" class="btn-location">📍 Ambil Lokasi Saat Ini</button>
                 <span id="locationStatus">Lokasi belum diambil</span>
             </div>
 
-            <!-- Tombol Foto Selfie -->
             <div class="camera-box">
                 <img id="photoPreview" src="" alt="Preview Selfie">
                 <label for="selfieInput" class="btn-custom-label btn-camera">📸 Ambil Foto Selfie</label>
@@ -227,17 +235,18 @@
                 <span id="cameraStatus">Foto selfie belum diambil</span>
             </div>
             
-            <!-- Input Hidden Koordinat & Base64 Foto -->
             <input type="hidden" id="lokasi" value="">
             <input type="hidden" id="fotoBase64" value="">
 
-            <!-- Tombol Kirim -->
             <button type="submit" class="btn-submit">Kirim Data</button>
+
+            <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vSGYOLLcStd0ddI4iaimv5O7zQ1ku1qbM3fVn_RoWuzdKhSzsFpdeqBF5KYapSrEd4cDSsxvDwGCf1P/pubhtml?gid=0&single=true" target="_blank" class="btn-view">📊 Lihat Data Absen</a>
         </form>
+        
         <div class="footer-copyright" style="text-align: center; margin-top: 24px; font-size: 11px; color: #9ca3af; line-height: 1.6;">
-    <div class="created-by" style="font-weight: 600; color: #6b7280;">Created By After Sales BIT</div>
-    <div>&copy; 2026 All Rights Reserved</div>
-</div>
+            <div class="created-by" style="font-weight: 600; color: #6b7280;">Created By After Sales BIT</div>
+            <div>© 2026 All Rights Reserved</div>
+        </div>
     </div>
 
     <script>
@@ -348,29 +357,4 @@
                 foto: fotoBase64Input.value
             };
 
-            const webhookUrl = 'https://n8n-m1wtmfpb5ajg.n8x.biz.id/webhook/c89bbaf9-4406-4449-916b-93b6081e4e39'; 
-
-            try {
-                const response = await fetch(webhookUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                
-                if (response.ok) {
-                    alert('🎉 Data absen berhasil dikirim!');
-                    document.getElementById('contactForm').reset();
-                    photoPreview.style.display = "none";
-                    locationStatus.textContent = "Lokasi belum diambil";
-                    cameraStatus.textContent = "Foto selfie belum diambil";
-                    locationBtn.textContent = "📍 Ambil Lokasi Saat Ini";
-                } else {
-                    alert('Server n8n merespons dengan error kode: ' + response.status);
-                }
-            } catch (error) {
-                alert('Gagal mengirim data (Masalah Koneksi/CORS): ' + error.message);
-            }
-        });
-    </script>
-</body>
-</html>
+            const webhookUrl = 'https://n8n-m
