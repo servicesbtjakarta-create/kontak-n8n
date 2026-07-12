@@ -226,7 +226,7 @@ selfieInput.addEventListener('change', function() {
                 
                 // Hitung estimasi ukuran akhir untuk log/status
                 const finalSizeKb = Math.round((compressedBase64.length * 0.75) / 1024);
-                cameraStatus.textContent = `✅ Foto berhasil dikunci! (~${finalSizeKb} KB)`;
+                cameraStatus.textContent = `✅ Foto berhasil dikunci!`;
             }
         }
         reader.readAsDataURL(file);
