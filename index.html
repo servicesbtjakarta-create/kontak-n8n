@@ -13,20 +13,12 @@
         /* Welcome Screen Styles */
         #welcomeScreen { text-align: center; }
         
-        /* CSS untuk Logo Halo Suzuki */
-        .welcome-logo-img {
-            max-width: 300px; /* Sesuaikan ukuran logo */
-            height: auto;
-            margin-bottom: 15px; /* Jarak antara logo dan teks */
-        }
-        
-        /* Menghapus ikon emoji lama */
+        .welcome-logo-img { max-width: 300px; height: auto; margin-bottom: 15px; }
         .welcome-emoji { font-size: 50px; margin-bottom: 20px; display: none; } 
         
         #welcomeScreen h2 { margin-bottom: 10px; }
         .btn-start { background-color: #FF6C37; color: white; padding: 15px; border-radius: 10px; cursor: pointer; border: none; width: 100%; font-weight: 600; margin-top: 20px; }
         
-        /* Hidden Class */
         .hidden { display: none; }
 
         /* Form & Button Styles */
@@ -45,35 +37,46 @@
         .btn-camera { background-color: #0284c7; color: white; }
         .btn-submit { background-color: #FF6C37; color: white; margin-top: 10px; }
         .btn-view { background-color: #374151; color: white; margin-top: 5px; }
+        /* SINKRONISASI TAMPILAN TOM SELECT DENGAN FORM STYLE ANDA */
+        .ts-wrapper.single .ts-control {
+         padding: 14px 16px !important;
+         border: 1.5px solid #d1d5db !important;
+         border-radius: 10px !important;
+         background-color: #f9fafb !important;
+         font-size: 15px !important;
+        }
+        .ts-dropdown {
+        border-radius: 10px !important;
+        margin-top: 5px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+        }
     </style>
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 </head>
 <body>
 
     <div class="card">
-        <!-- Halaman Cover -->
         <div id="welcomeScreen">
-            <!-- Tambahkan tag img di sini -->
             <img src="image_4cd6dd.png" alt="Logo Halo Suzuki" class="welcome-logo-img">
-            
-            <!-- Emoji lama disembunyikan -->
             <div class="welcome-emoji hidden">🚀</div> 
-            
             <h2>Selamat Datang</h2>
             <p class="subtitle">Sistem Absensi Digital<br>After Sales BIT Jakarta</p>
             <button id="btnStart" class="btn-start">Mulai Absensi</button>
         </div>
 
-        <!-- Form Utama (Disembunyikan Awalnya) -->
         <div id="mainForm" class="hidden">
             <h2>Sistem Absensi SERA BIT Jakarta</h2>
-        <div class="subtitle"></div>
+            <div class="subtitle"></div>
             
             <form id="contactForm">
                 <div class="form-group">
-                    <label for="nama">Nama Lengkap</label>
-                    <input type="text" id="nama" placeholder="Nama Lengkap" required>
+                    <label for="namaLengkap">Nama Lengkap</label>
+                    <select id="namaLengkap" name="namaLengkap" required>
+                        <option value="">-- Pilih Karyawan (NIK - Nama) --</option>
+                    </select>
                 </div>
-                <!-- ... (Input lainnya) ... -->
+
                 <div class="form-group">
                     <label for="cabangAsal">Cabang Asal</label>
                     <select id="cabangAsal" required>
@@ -119,14 +122,133 @@
                 <button type="submit" class="btn-submit">Kirim Data</button>
                 <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vSGYOLLcStd0ddI4iaimv5O7zQ1ku1qbM3fVn_RoWuzdKhSzsFpdeqBF5KYapSrEd4cDSsxvDwGCf1P/pubhtml?gid=0&single=true" target="_blank" class="btn-view">📊 Lihat Data Absen</a>
             </form>
+            
             <div class="footer-copyright" style="text-align: center; margin-top: 24px; font-size: 11px; color: #9ca3af; line-height: 1.6;">
-            <div class="created-by" style="font-weight: 600; color: #6b7280;">Created By After Sales BIT</div>
-            <div>© 2026 All Rights Reserved</div>
+                <div class="created-by" style="font-weight: 600; color: #6b7280;">Created By After Sales BIT</div>
+                <div>© 2026 All Rights Reserved</div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Logika Pindah Halaman
+        // 1. Data Mapping Karyawan
+        const dataKaryawan = [
+            { "nik": "6", "nama": "R. ARIPIN", "cabang": "PURI" },
+            { "nik": "230", "nama": "HELLY YULMANI", "cabang": "BSD" },
+            { "nik": "275", "nama": "WARSIS", "cabang": "GDS" },
+            { "nik": "430", "nama": "ARDI", "cabang": "PURI" },
+            { "nik": "10369", "nama": "AMIM MASRUR", "cabang": "SWG" },
+            { "nik": "51043", "nama": "SUHARTO DARMAWAN", "cabang": "GWB" },
+            { "nik": "51087", "nama": "MOHAMAD JEKI MUSLIH", "cabang": "PG" },
+            { "nik": "51328", "nama": "HARIS BEKTI PRATAMA", "cabang": "LCK" },
+            { "nik": "51364", "nama": "HARLY ANDIKA FEBRIYANTO", "cabang": "GWB" },
+            { "nik": "51369", "nama": "GRANDIS DWI SASONGKO", "cabang": "BSD" },
+            { "nik": "51371", "nama": "NOVEN ASHARI", "cabang": "GDS" },
+            { "nik": "52188", "nama": "WAHYU WAKTUROHMAN", "cabang": "PURI" },
+            { "nik": "52236", "nama": "M. WILDAN ASHARI", "cabang": "DS" },
+            { "nik": "52241", "nama": "AHMAD ARIDHONI HIDAYAT", "cabang": "STR" },
+            { "nik": "52243", "nama": "YOYOK SUONO", "cabang": "DS" },
+            { "nik": "52244", "nama": "ARIH SETIYA", "cabang": "DS" },
+            { "nik": "52248", "nama": "CRISYANTO DWI SAPUTRA", "cabang": "DS" },
+            { "nik": "52254", "nama": "MULYADI / A", "cabang": "PURI" },
+            { "nik": "52284", "nama": "DENDANG FERRY S. W.", "cabang": "GDS" },
+            { "nik": "52285", "nama": "IHSAN MUKHLIS", "cabang": "GDS" },
+            { "nik": "52291", "nama": "ARIS HERDIANA", "cabang": "DS" }, // Perbaikan sintaks key "looking" -> "nama"
+            { "nik": "52295", "nama": "AGUS RAHMAN", "cabang": "GDS" },
+            { "nik": "52326", "nama": "MUKLIS SUSANTO", "cabang": "PG" },
+            { "nik": "52468", "nama": "SHOLI IMRON", "cabang": "HI" },
+            { "nik": "52824", "nama": "ADITYA WAHYU KUNCORO", "cabang": "SWG" },
+            { "nik": "52826", "nama": "ULUL AZMI", "cabang": "DS" },
+            { "nik": "52854", "nama": "REFFI ZULFIKAR RAZIF", "cabang": "LCK" },
+            { "nik": "53149", "nama": "DENDI ANSYAH", "cabang": "HI" },
+            { "nik": "53157", "nama": "RENDY SURYA PRATAMA", "cabang": "BSD" },
+            { "nik": "53158", "nama": "BAYU OKTA FERNANDA Z", "cabang": "HI" },
+            { "nik": "53160", "nama": "NURUL HUDA", "cabang": "PURI" },
+            { "nik": "53161", "nama": "A. FAZAR SODIK", "cabang": "STR" },
+            { "nik": "53163", "nama": "BREN PUTRADES", "cabang": "DS" },
+            { "nik": "53164", "nama": "MUHAMMAD AWANG SURYA", "cabang": "STR" },
+            { "nik": "53253", "nama": "FANDU WINATA", "cabang": "LCK" },
+            { "nik": "53256", "nama": "AHMAD RONI AMSAH", "cabang": "PIK" },
+            { "nik": "53477", "nama": "SUDARMANTO", "cabang": "PURI" },
+            { "nik": "53478", "nama": "SETO BAGUS MUKMIN", "cabang": "STR" },
+            { "nik": "53536", "nama": "ARIEF FEBRIANSYAH", "cabang": "PG" },
+            { "nik": "53538", "nama": "M. CHOIRUL MUSTAQIM", "cabang": "PIK" },
+            { "nik": "53564", "nama": "SULIS WAHYUDI", "cabang": "HI" },
+            { "nik": "56366", "nama": "JOKO SARWONO", "cabang": "LCK" },
+            { "nik": "56562", "nama": "MOH. TABIIN MAULANA", "cabang": "PG" },
+            { "nik": "57291", "nama": "ADI SAPUTRA", "cabang": "GWB" },
+            { "nik": "57293", "nama": "FUAD AKROMUL ANGGRIAWAN", "cabang": "PG" },
+            { "nik": "57384", "nama": "RENDIKA ABDI FANSHURI", "cabang": "PURI" },
+            { "nik": "57385", "nama": "FARID MUSTAQIM", "cabang": "LCK" },
+            { "nik": "57386", "nama": "IRWANDI", "cabang": "STR" },
+            { "nik": "57500", "nama": "RIYAN MUHID LUKMAN HAKIM", "cabang": "PIK" },
+            { "nik": "57501", "nama": "MOHAMAD TAUFIK MAULANA", "cabang": "BSD" },
+            { "nik": "57502", "nama": "ARY KOESWANDI", "cabang": "BSD" },
+            { "nik": "57563", "nama": "MAZI KARULLAH", "cabang": "BSD" },
+            { "nik": "57823", "nama": "DIKA GUSTAMA RESTUFANDRI", "cabang": "GDS" },
+            { "nik": "57845", "nama": "MUHAMMAD MULYONO", "cabang": "PIK" },
+            { "nik": "57918", "nama": "BIMA ANGGARA PUTRA", "cabang": "PIK" },
+            { "nik": "58061", "nama": "ALFIAN AFFANDA RAMADHANI", "cabang": "DS" },
+            { "nik": "58192", "nama": "NIKO BANGSAWAN", "cabang": "PIK" },
+            { "nik": "58195", "nama": "TOMY GUMILAR", "cabang": "PG" },
+            { "nik": "58295", "nama": "BIMO BAIHAQI", "cabang": "STR" },
+            { "nik": "58446", "nama": "SETIAWAN JOVI", "cabang": "BSD" },
+            { "nik": "58447", "nama": "VICKY RUDIANSYAH", "cabang": "STR" },
+            { "nik": "58471", "nama": "DANU PRASETYO", "cabang": "PURI" },
+            { "nik": "58472", "nama": "PURWANTO", "cabang": "HI" },
+            { "nik": "58565", "nama": "GEGEN GENTA DEWA", "cabang": "GDS" },
+            { "nik": "58719", "nama": "AZIZ WAHYUDIN", "cabang": "HI" },
+            { "nik": "58921", "nama": "JANUAR ROMADONI", "cabang": "DS" },
+            { "nik": "58922", "nama": "MOCHAMAD REZA AL GHIFARI", "cabang": "LCK" },
+            { "nik": "58972", "nama": "DIO ASSHOBY", "cabang": "GWB" },
+            { "nik": "58973", "nama": "SUKMA IWANG SUWANGSA", "cabang": "DS" },
+            { "nik": "59214", "nama": "RAHMAD ADAM SUSILO", "cabang": "PG" },
+            { "nik": "59547", "nama": "ILHAM MUZAMMIL", "cabang": "GDS" },
+            { "nik": "59588", "nama": "BENITO DIDA ZAKIA", "cabang": "GDS" },
+            { "nik": "59589", "nama": "HERI SUSANTO", "cabang": "BSD" },
+            { "nik": "59945", "nama": "HILMI SATRIAWAN", "cabang": "LCK" },
+            { "nik": "60220", "nama": "ANDRE RIZKY RAHMAT HIDAYAH", "cabang": "GWB" },
+            { "nik": "60222", "nama": "HAFIZUL NAJIB", "cabang": "GDS" },
+            { "nik": "60223", "nama": "ZACKY ALFARIDZI", "cabang": "DS" },
+            { "nik": "61145", "nama": "ANUGRAH FEBRIANTO", "cabang": "HI" },
+            { "nik": "61146", "nama": "BAYU ALMUBAROK", "cabang": "BSD" },
+            { "nik": "61295", "nama": "ASEP SAEPULLAHDI", "cabang": "LCK" },
+            { "nik": "61296", "nama": "MUHAMAD YAZID RIDHO", "cabang": "STR" },
+            { "nik": "61560", "nama": "MUHAMMAD FIKRI GUNAWAN", "cabang": "PG" },
+            { "nik": "61754", "nama": "DANDA RIKI MUHAIMIN", "cabang": "PG" },
+            { "nik": "61755", "nama": "M. IQBAL ARDIANSYAH", "cabang": "BSD" },
+            { "nik": "61756", "nama": "SETIAWAN BOVI", "cabang": "PIK" },
+            { "nik": "61819", "nama": "MUHAMAD ZIDAN KUSNADHEAVEN", "cabang": "GDS" },
+            { "nik": "62021", "nama": "RANDY EKA SETYAWAN", "cabang": "GDS" }
+        ];
+
+        // 2. Mengisi Dropdown secara otomatis ketika DOM siap
+        document.addEventListener("DOMContentLoaded", function() {
+            const selectNama = document.getElementById('namaLengkap');
+            
+            if (selectNama) {
+                // Langkah A: Masukkan semua data opsi ke dalam elemen select dahulu
+                dataKaryawan.forEach(karyawan => {
+                    let option = document.createElement('option');
+                    option.value = karyawan.nama; 
+                    option.textContent = `${karyawan.nik} - ${karyawan.nama}`;
+                    selectNama.appendChild(option);
+                });
+
+                // Langkah B: Aktifkan TomSelect SEKALI SAJA setelah perulangan selesai
+                new TomSelect("#namaLengkap", {
+                    create: false,
+                    sortField: {
+                        field: "text",
+                        direction: "asc"
+                    },
+                    placeholder: "-- Ketik NIK atau Nama Karyawan --",
+                    allowEmptyOption: false
+                });
+            }
+        });
+
+        // Logika Pindah Halaman Cover ke Form Utama
         const btnStart = document.getElementById('btnStart');
         const welcomeScreen = document.getElementById('welcomeScreen');
         const mainForm = document.getElementById('mainForm');
@@ -136,6 +258,7 @@
             mainForm.classList.remove('hidden');
         });
 
+        // Setup Elemen Form & Input
         const locationBtn = document.getElementById('getLocationBtn');
         const locationStatus = document.getElementById('locationStatus');
         const lokasiInput = document.getElementById('lokasi');
@@ -169,119 +292,67 @@
             );
         });
 
- // Proses Konversi Gambar Kamera, Kompresi < 200KB & Preview
-selfieInput.addEventListener('change', function() {
-    const file = this.files[0];
-    if (file) {
-        cameraStatus.textContent = "⏳ Memproses & mengompres foto...";
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-            const img = new Image();
-            img.src = e.target.result;
-            
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                let ctx = canvas.getContext('2d');
-                
-                // 1. Tentukan maksimal resolusi (bisa disesuaikan)
-                const MAX_WIDTH = 800;
-                const MAX_HEIGHT = 800;
-                let width = img.width;
-                let height = img.height;
-                
-                if (width > height) {
-                    if (width > MAX_WIDTH) {
-                        height *= MAX_WIDTH / width;
-                        width = MAX_WIDTH;
-                    }
-                } else {
-                    if (height > MAX_HEIGHT) {
-                        width *= MAX_HEIGHT / height;
-                        height = MAX_HEIGHT;
-                    }
+        // Konversi Gambar Selfie ke Base64
+        selfieInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                cameraStatus.textContent = "⏳ Memproses foto...";
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    fotoBase64Input.value = e.target.result;
+                    photoPreview.src = e.target.result;
+                    photoPreview.style.display = "block";
+                    cameraStatus.textContent = "✅ Foto selfie berhasil dikunci!";
                 }
-                
-                canvas.width = width;
-                canvas.height = height;
-                
-                // Gambar ulang image ke canvas dengan resolusi baru
-                ctx.drawImage(img, 0, 0, width, height);
-                
-                // 2. Lakukan kompresi kualitas (mulai dari 0.7 atau 70%)
-                let quality = 0.7;
-                let compressedBase64 = canvas.toDataURL('image/jpeg', quality);
-                
-                // 3. Loop mengecilkan kualitas jika file masih di atas 200 KB (~270000 karakter Base64)
-                // (Ukuran karakter Base64 sekitar 33% lebih besar dari binary asli)
-                while (compressedBase64.length * 0.75 > 200 * 1024 && quality > 0.1) {
-                    quality -= 0.1;
-                    compressedBase64 = canvas.toDataURL('image/jpeg', quality);
-                }
-                
-                // Simpan hasil kompresi ke input hidden dan tampilkan preview
-                fotoBase64Input.value = compressedBase64;
-                photoPreview.src = compressedBase64;
-                photoPreview.style.display = "block";
-                
-                // Hitung estimasi ukuran akhir untuk log/status
-                const finalSizeKb = Math.round((compressedBase64.length * 0.75) / 1024);
-                cameraStatus.textContent = `✅ Foto berhasil dikunci!`;
+                reader.readAsDataURL(file);
             }
-        }
-        reader.readAsDataURL(file);
-    }
-});
+        });
 
-        // Event Submit Form
+        // Event Submit Form Absensi
         document.getElementById('contactForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const namaValue = document.getElementById('nama').value.trim();
+            // Perbaikan: Membaca ID elemen dropdown yang baru
+            const namaValue = document.getElementById('namaLengkap').value.trim();
             const cabangAsalValue = document.getElementById('cabangAsal').value;
             const lokasiSeraValue = document.getElementById('lokasiSera').value;
 
-            // 1. Validasi Required Nama
+            // Validasi Data Input
             if (!namaValue) {
                 alert('⚠️ Kolom Nama Lengkap wajib diisi!');
-                document.getElementById('nama').focus();
+                document.getElementById('namaLengkap').focus();
                 return;
             }
 
-            // 2. Validasi Required Cabang Asal
             if (!cabangAsalValue) {
                 alert('⚠️ Silakan pilih Cabang Asal terlebih dahulu!');
                 document.getElementById('cabangAsal').focus();
                 return;
             }
 
-            // 3. Validasi Required Lokasi SERA
             if (!lokasiSeraValue) {
                 alert('⚠️ Silakan pilih Lokasi Cabang SERA terlebih dahulu!');
                 document.getElementById('lokasiSera').focus();
                 return;
             }
 
-            // 4. Validasi Required Kunci Koordinat GPS Lokasi
             if (!lokasiInput.value) {
                 alert('⚠️ Anda wajib klik tombol "Ambil Lokasi Saat Ini" sebelum mengirim data absen!');
                 return;
             }
 
-            // 5. Validasi Required Foto Selfie
             if (!fotoBase64Input.value) {
                 alert('⚠️ Anda wajib mengambil "Foto Selfie" sebelum mengirim data absen!');
                 return;
             }
             
-            // Format waktu standar Indonesia
             const waktuSekarang = new Date().toLocaleString("id-ID", {
                 timeZone: "Asia/Jakarta",
                 dateStyle: "medium",
                 timeStyle: "medium"
             });
 
-            // Menyusun payload objek data untuk dikirim ke webhook
+            // Menyusun payload objek data untuk dikirim ke webhook n8n
             const data = {
                 nama: namaValue,
                 cabang_asal: cabangAsalValue, 
